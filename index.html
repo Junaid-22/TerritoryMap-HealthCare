@@ -52,7 +52,7 @@
             justify-content: space-between;
             align-items: center;
             flex-wrap: nowrap;
-            gap: 16px;
+            gap: 256px;
             position: sticky;
             top: 0;
             z-index: 100;
@@ -137,7 +137,7 @@
             transform: translateY(-1px);
             box-shadow: var(--shadow-md);
             border-color: var(--primary);
-            background: #F8FAFF;
+            background: #020e2e;
         }
         
         .nav-btn {
@@ -170,6 +170,9 @@
             background: white;
             border: 1px solid var(--border-light);
             color: var(--text-secondary);
+        }
+        .reset-btn:hover {
+            color: #F5F7FA;
         }
         
         button:active { transform: scale(0.97); }
@@ -350,6 +353,9 @@
         /* MAP AREA - Premium container */
         .map-container {
             flex: 1;
+            min-width: 0;
+            min-height: 600px;
+            height: calc(100vh - 140px);
             position: relative;
             border-radius: var(--radius-xl);
             overflow: hidden;
@@ -359,6 +365,7 @@
         #map {
             width: 100%;
             height: 100%;
+            min-height: 600px;
             background: #EFF3F8;
         }
         
@@ -491,13 +498,241 @@
             font-size: 0.8rem;
         }
         
-        @media (max-width: 860px) {
-            #main { flex-direction: column; padding: 16px; gap: 16px; }
-            #sidebar { width: 100%; max-height: 380px; }
-            .map-container { min-height: 55vh; }
-            .controls { gap: 6px; }
-            button { padding: 6px 12px; font-size: 0.7rem; }
-            .map-legend { bottom: 10px; left: 10px; padding: 8px 12px; }
+        /* LARGE LAPTOPS / SMALL DESKTOPS */
+        @media (max-width: 1400px) {
+            #header {
+                padding: 12px 20px;
+                gap: 12px;
+            }
+
+            h1.title {
+                font-size: 1.7rem;
+            }
+
+            #main {
+                padding: 20px;
+                gap: 20px;
+            }
+
+            #sidebar {
+                width: 340px;
+            }
+        }
+
+        /* TABLETS */
+        @media (max-width: 1200px) {
+            body {
+                height: auto;
+                min-height: 100vh;
+            }
+
+            #header {
+                flex-wrap: wrap;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .logo-area {
+                flex: 1 1 100%;
+                justify-content: center;
+            }
+
+            h1.title {
+                width: 100%;
+                order: 2;
+                font-size: 1.6rem;
+                text-align: center;
+            }
+
+            .controls {
+                order: 3;
+                width: 100%;
+                justify-content: flex-start;
+                padding-bottom: 4px;
+            }
+
+            #main {
+                flex-direction: column;
+                overflow: visible;
+                min-height: auto;
+            }
+
+            #sidebar {
+                width: 100%;
+                max-height: none;
+                overflow: visible;
+            }
+
+            .info-panel {
+                padding: 18px 20px;
+            }
+
+            .map-container {
+                width: 100%;
+                min-height: 70vh;
+                height: 70vh;
+            }
+
+            #map {
+                min-height: 70vh;
+            }
+        }
+
+        /* MOBILE */
+        @media (max-width: 768px) {
+            #header {
+                padding: 12px 14px;
+                gap: 10px;
+            }
+
+            .logo-area img {
+                max-width: 150px;
+                height: auto;
+            }
+
+            h1.title {
+                font-size: 1.3rem;
+                white-space: normal;
+                line-height: 1.2;
+            }
+
+            .controls {
+                gap: 8px;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: thin;
+                padding-bottom: 4px;
+            }
+
+            .controls button,
+            .controls .btn-secondary {
+                flex: 0 0 auto;
+                white-space: nowrap;
+            }
+
+            #main {
+                padding: 14px;
+                gap: 14px;
+            }
+
+            #statsContent {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 12px;
+            }
+
+            .kpi-card {
+                padding: 12px 10px;
+            }
+
+            .kpi-value {
+                font-size: 1.5rem;
+            }
+
+            .territory-buttons {
+                flex-wrap: wrap;
+            }
+
+            .territory-buttons button {
+                min-width: calc(50% - 5px);
+            }
+
+            select,
+            .choices__inner {
+                font-size: 0.8rem;
+                padding: 10px 12px;
+            }
+
+            .map-container {
+                min-height: 62vh;
+                height: 62vh;
+                border-radius: 20px;
+            }
+
+            #map {
+                min-height: 62vh;
+            }
+
+            .map-legend {
+                bottom: 12px;
+                left: 12px;
+                padding: 10px 12px;
+                font-size: 0.68rem;
+                max-width: calc(100% - 24px);
+            }
+
+            .territory-label {
+                font-size: 10px;
+                padding: 5px 12px;
+            }
+        }
+
+        /* SMALL MOBILE */
+        @media (max-width: 480px) {
+            #header {
+                padding: 10px 10px 12px;
+            }
+
+            .logo-area {
+                gap: 8px;
+            }
+
+            .logo-area img {
+                max-width: 130px;
+            }
+
+            h1.title {
+                font-size: 1.1rem;
+            }
+
+            button,
+            .btn-secondary {
+                padding: 7px 10px;
+                font-size: 0.66rem;
+            }
+
+            .info-panel {
+                padding: 16px;
+                border-radius: 18px;
+            }
+
+            .info-panel h3 {
+                font-size: 0.78rem;
+                margin-bottom: 16px;
+                padding-left: 10px;
+            }
+
+            #statsContent {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .territory-buttons {
+                flex-direction: column;
+            }
+
+            .territory-buttons button {
+                min-width: 100%;
+            }
+
+            .choices {
+                max-height: 170px;
+            }
+
+            .choices__list--dropdown {
+                max-height: 130px !important;
+            }
+
+            .map-container {
+                min-height: 58vh;
+                height: 58vh;
+            }
+
+            #map {
+                min-height: 58vh;
+            }
+
+            .map-legend {
+                padding: 8px 10px;
+            }
         }
     </style>
 </head>
@@ -617,8 +852,18 @@
         async function loadGeoJSON(url, isNursing = false) { const datasetKey = isNursing ? "NURSING" : "ALLIED"; showLoading(`Loading ${datasetKey}...`); try { let geoData = await fetchGeoJSONWithCache(url, datasetKey); const savedStatuses = await loadFromSheet(); for (let feat of geoData.features) { if (!feat.properties) feat.properties = {}; const territoryName = feat.properties.Territory_ || feat.properties.Territory; let defaultStatus = isNursing ? "AVAILABLE" : "OPEN"; if (savedStatuses?.has(territoryName) && savedStatuses.get(territoryName) === "SOLD") defaultStatus = "SOLD"; feat.properties.Status = defaultStatus; } if (currentGeoLayer) map.removeLayer(currentGeoLayer); currentGeoLayer = L.geoJSON(geoData, { style: (feature) => { const status = feature.properties.Status; const baseColor = (status === "OPEN" || status === "AVAILABLE") ? COLOR_OPEN : COLOR_SOLD; return { color: baseColor, weight: 0.8, fillOpacity: 0.7, opacity: 0.9, fillColor: baseColor }; }, onEachFeature: (feature, layer) => { layer.on({ mouseover: (e) => { if (e.target.options.fillOpacity > 0) e.target.setStyle({ weight: 2, color: "#ffc107" }); }, mouseout: () => refreshAllStyles(), click: (e) => { if (e.target.options.fillOpacity > 0) { const status = feature.properties.Status; const statusColor = (status === "OPEN" || status === "AVAILABLE") ? COLOR_OPEN : COLOR_SOLD; layer.bindPopup(`<b>🏘️ ${feature.properties.Territory_ || feature.properties.Territory}</b><br>📍 ${feature.properties.County}<br>🗺️ ${feature.properties.State}<br><span style="color:${statusColor}; font-weight:bold;">📌 ${status}</span>`).openPopup(); } } }); } }).addTo(map); const territoryMap = new Map(); currentGeoLayer.eachLayer(l => { const raw = l.feature.properties.Territory_ || l.feature.properties.Territory; const clean = raw.trim().toUpperCase(); if (!territoryMap.has(clean)) territoryMap.set(clean, raw); }); allTerritoriesList = Array.from(territoryMap.values()).sort(); if (territoryChoices) { territoryChoices.clearStore(); territoryChoices.setChoices(allTerritoriesList.map(t => ({ value: t, label: t }))); territoryChoices.removeActiveItems(); } addTerritoryLabels(); refreshAllStyles(); map.fitBounds(CONTINENTAL_BOUNDS); hideLoading(); showToast(`✅ ${datasetKey} ready`); ensureBoundaryOnTop(); } catch(err) { hideLoading(); showToast(`Error loading ${datasetKey}!`, true); } }
         async function switchToAllied() { if (currentDataset === "ALLIED") return; currentDataset = "ALLIED"; updateUIForDataset(); await loadGeoJSON(ALLIED_URL, false); ensureBoundaryOnTop(); }
         async function switchToNursing() { if (currentDataset === "NURSING") return; currentDataset = "NURSING"; updateUIForDataset(); await loadGeoJSON(NURSING_URL, true); ensureBoundaryOnTop(); }
-        async function initMapAndControls() { map = L.map('map', { zoomSnap: 0.5, zoomDelta: 0.5, zoomControl: true, maxZoom: 24, minZoom: 3 }).setView([39.5, -98.5], 5); L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; OSM & CartoDB', subdomains: 'abcd', maxZoom: 24 }).addTo(map); territoryChoices = new Choices('#territorySearch', { removeItemButton: true, placeholderValue: '🔍 Search territory...', searchEnabled: true, searchChoices: true, shouldSort: false, itemSelectText: '' }); document.getElementById("territorySearch").addEventListener('change', () => { applyFiltersFast(); setTimeout(() => zoomToSelectedTerritories(), 150); }); document.getElementById("statusFilter").addEventListener("change", () => applyFiltersFast()); document.getElementById("resetMap").addEventListener("click", () => { map.fitBounds(CONTINENTAL_BOUNDS); ensureBoundaryOnTop(); }); document.getElementById("markOpenBtn").addEventListener("click", () => markVisibleAs(getOpenStatusName())); document.getElementById("markSold").addEventListener("click", () => markVisibleAs("SOLD")); document.getElementById("saveChanges").addEventListener("click", saveToSheet); document.getElementById("exportCSV").addEventListener("click", exportCSVSelectedOnly); document.getElementById("selectAllTerritories").addEventListener("click", selectAllTerritories); document.getElementById("clearAllTerritories").addEventListener("click", clearAllAndResetView); document.getElementById("goToNursing").addEventListener("click", switchToNursing); document.getElementById("goToAllied").addEventListener("click", switchToAllied); updateUIForDataset(); await loadBoundaryLayer(); await loadGeoJSON(ALLIED_URL, false); await loadGoogleSheetLinks(); ensureBoundaryOnTop(); }
+        function refreshMapSize() {
+            if (!map || typeof map.invalidateSize !== 'function') return;
+            setTimeout(() => {
+                map.invalidateSize(true);
+                ensureBoundaryOnTop();
+            }, 250);
+        }
+        async function initMapAndControls() { map = L.map('map', { zoomSnap: 0.5, zoomDelta: 0.5, zoomControl: true, maxZoom: 24, minZoom: 3 }).setView([39.5, -98.5], 5); L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; OSM & CartoDB', subdomains: 'abcd', maxZoom: 24 }).addTo(map); territoryChoices = new Choices('#territorySearch', { removeItemButton: true, placeholderValue: '🔍 Search territory...', searchEnabled: true, searchChoices: true, shouldSort: false, itemSelectText: '' }); document.getElementById("territorySearch").addEventListener('change', () => { applyFiltersFast(); setTimeout(() => zoomToSelectedTerritories(), 150); }); document.getElementById("statusFilter").addEventListener("change", () => applyFiltersFast()); document.getElementById("resetMap").addEventListener("click", () => { map.fitBounds(CONTINENTAL_BOUNDS); ensureBoundaryOnTop(); refreshMapSize(); }); document.getElementById("markOpenBtn").addEventListener("click", () => markVisibleAs(getOpenStatusName())); document.getElementById("markSold").addEventListener("click", () => markVisibleAs("SOLD")); document.getElementById("saveChanges").addEventListener("click", saveToSheet); document.getElementById("exportCSV").addEventListener("click", exportCSVSelectedOnly); document.getElementById("selectAllTerritories").addEventListener("click", selectAllTerritories); document.getElementById("clearAllTerritories").addEventListener("click", clearAllAndResetView); document.getElementById("goToNursing").addEventListener("click", switchToNursing); document.getElementById("goToAllied").addEventListener("click", switchToAllied); updateUIForDataset(); await loadBoundaryLayer(); await loadGeoJSON(ALLIED_URL, false); await loadGoogleSheetLinks(); ensureBoundaryOnTop(); refreshMapSize(); }
         window.addEventListener('DOMContentLoaded', initMapAndControls);
+        window.addEventListener('load', refreshMapSize);
+        window.addEventListener('resize', refreshMapSize);
+        window.addEventListener('orientationchange', refreshMapSize);
     </script>
 </body>
 </html>
