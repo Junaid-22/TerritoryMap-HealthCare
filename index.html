@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>HealthRecruit Pro | Territory Manager + Docs Integration</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        /* ENTERPRISE DESIGN SYSTEM */
+        :root {
+            --primary: #2F3E9E;
+            --primary-dark: #1f2c6f;
+            --accent: #FF8C00;
+            --accent-glow: rgba(255, 140, 0, 0.15);
+            --bg-main: #F5F7FA;
+            --bg-surface: #ffffff;
+            --text-primary: #1F2937;
+            --text-secondary: #4B5563;
+            --text-muted: #6B7280;
+            --border-light: #E5E9F0;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -1px rgb(0 0 0 / 0.03);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -2px rgb(0 0 0 / 0.05);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.05);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --radius-xl: 28px;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-main);
+            color: var(--text-primary);
+            font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+        }
+        
+        /* HEADER - Premium Glassmorphic */
+        #header {
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid var(--border-light);
+            padding: 12px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: nowrap;
+            gap: 16px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            min-width: 0;
+        }
+        h1.title {
+             margin: 0 auto;
+    text-align: center;
+    white-space: nowrap;
+    font-size: 2.0rem;
+    font-weight: 600;
+}
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary) 0%, #1e2a5e 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        h1::before {
+            background: none;
+            -webkit-background-clip: unset;
+            color: var(--primary);
+        }
+        
+        .badge-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        
+        .dataset-badge {
+            background: var(--primary);
+            color: white;
+            padding: 6px 16px;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .controls {
+            display: flex;
+            gap: 6px;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            flex-shrink: 0;
+            align-items: center;
+        }
+        
+        button, .btn-secondary {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 100px;
+            cursor: pointer;
+            font-size: 0.7rem;
+            font-weight: 999;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            background: var(--bg-surface);
+            color: var(--primary);
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        button:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary);
+            background: #F8FAFF;
+        }
+        
+        .nav-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .nav-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+        
+        .mark-open {
+            background: #6B7280;
+            color: white;
+            border: none;
+        }
+        
+        .mark-open:hover { background: #4B5563; }
+        
+        .mark-sold, .save-btn, .export-csv {
+            background: var(--primary);
+            color: white;
+            border: none;
+        }
+        
+        .reset-btn {
+            background: white;
+            border: 1px solid var(--border-light);
+            color: var(--text-secondary);
+        }
+        
+        button:active { transform: scale(0.97); }
+        
+        /* MAIN LAYOUT */
+        #main {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            padding: 24px 28px 28px 28px;
+            gap: 24px;
+        }
+        
+        /* SIDEBAR - Card based */
+        #sidebar {
+            width: 380px;
+            background: transparent;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        /* Custom scrollbar */
+        #sidebar::-webkit-scrollbar {
+            width: 5px;
+        }
+        #sidebar::-webkit-scrollbar-track {
+            background: #E5E7EB;
+            border-radius: 10px;
+        }
+        #sidebar::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+        
+        .info-panel {
+            background: var(--bg-surface);
+            border-radius: var(--radius-xl);
+            padding: 20px 24px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(255,255,255,0.5);
+            transition: transform 0.1s ease, box-shadow 0.2s ease;
+        }
+        
+        .info-panel:hover {
+            box-shadow: var(--shadow-xl);
+        }
+        
+        .info-panel h3 {
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-left: 3px solid var(--accent);
+            padding-left: 14px;
+        }
+        
+        /* KPI Cards */
+        #statsContent {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+        }
+        
+        .kpi-card {
+            background: #F9FAFE;
+            border-radius: var(--radius-md);
+            padding: 14px 12px;
+            text-align: center;
+            transition: all 0.2s;
+            border: 1px solid var(--border-light);
+        }
+        
+        .kpi-value {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary);
+            line-height: 1.2;
+        }
+        
+        .kpi-label {
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-top: 6px;
+            letter-spacing: 0.3px;
+        }
+        
+        .kpi-sub {
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+        
+        /* Filter components */
+        .filter-group {
+            margin-bottom: 18px;
+        }
+        
+        .filter-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+        
+        select, .choices__inner {
+            background-color: #ffffff;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-light);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            padding: 10px 14px;
+            transition: all 0.2s;
+        }
+        
+        select:focus, .choices__inner:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(47, 62, 158, 0.1);
+            outline: none;
+        }
+        
+        /* Territory search wrapper - FIXED: scroll only the choices dropdown, buttons always visible */
+        .territory-search-wrapper {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Choices container with limited height and scroll */
+        .choices {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-bottom: 12px;
+        }
+        
+        .choices__list--dropdown {
+            max-height: 150px !important;
+            overflow-y: auto;
+        }
+        
+        .choices__list--multiple .choices__item {
+            background-color: #2B388F;
+            border-radius: 40px;
+            padding-right: 8px;
+        }
+        .choices__list--multiple .choices__item .choices__button {
+            border-left: none;
+            margin-left: 4px;
+        }
+        .choices__list--multiple .choices__item .choices__button:hover {
+            background: transparent;
+        }
+        
+        /* Buttons always visible at bottom, no scroll affecting them */
+        .territory-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border-light);
+    background: white;
+}
+        
+        .territory-buttons button {
+            flex: 1;
+            font-size: 0.7rem;
+            padding: 8px 0;
+        }
+        
+        /* MAP AREA - Premium container */
+        .map-container {
+            flex: 1;
+            position: relative;
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            box-shadow: var(--shadow-xl);
+        }
+        
+        #map {
+            width: 100%;
+            height: 100%;
+            background: #EFF3F8;
+        }
+        
+        /* Map Legend Overlay - Left side */
+        .map-legend {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            padding: 12px 18px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            z-index: 400;
+            font-size: 0.7rem;
+            font-weight: 500;
+            border: 1px solid var(--border-light);
+            pointer-events: none;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+        
+        .legend-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .legend-color {
+            width: 14px;
+            height: 14px;
+            border-radius: 4px;
+        }
+        
+        .legend-color.open { background: #6B7280; }
+        .legend-color.sold { background: var(--primary); }
+        
+        /* Loading Overlay */
+        #loadingOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(47, 62, 158, 0.92);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            backdrop-filter: blur(12px);
+        }
+        
+        .loading-card {
+            background: white;
+            padding: 32px 48px;
+            border-radius: 32px;
+            text-align: center;
+            box-shadow: var(--shadow-xl);
+            border-top: 4px solid var(--accent);
+        }
+        
+        .spinner {
+            width: 44px;
+            height: 44px;
+            border: 3px solid #E5E9F0;
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+            margin: 0 auto 18px;
+        }
+        
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .toast-notify {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            background: var(--primary);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            z-index: 10001;
+            animation: slideUpFade 2.8s ease forwards;
+            box-shadow: var(--shadow-lg);
+            backdrop-filter: blur(4px);
+        }
+        
+        @keyframes slideUpFade {
+            0% { opacity: 0; transform: translateY(20px); }
+            15% { opacity: 1; transform: translateY(0); }
+            85% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; visibility: hidden; transform: translateY(-10px); }
+        }
+        
+        /* Territory Labels - Modern */
+        .territory-label {
+            background: rgba(47, 62, 158, 0.92);
+            backdrop-filter: blur(8px);
+            color: white;
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-size: 11px;
+            font-weight: 600;
+            white-space: nowrap;
+            box-shadow: var(--shadow-md);
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+            border: 1px solid rgba(255,255,255,0.2);
+            letter-spacing: 0.2px;
+        }
+        
+        .territory-label:hover {
+            background: var(--primary);
+            transform: scale(1.03);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--accent);
+        }
+        .choices[data-type*="select-multiple"] .choices__list--dropdown {
+    top: auto !important;
+    bottom: 100% !important;
+    margin-bottom: 6px;
+}
+        
+        .choices__input {
+            font-size: 0.8rem;
+        }
+        
+        @media (max-width: 860px) {
+            #main { flex-direction: column; padding: 16px; gap: 16px; }
+            #sidebar { width: 100%; max-height: 380px; }
+            .map-container { min-height: 55vh; }
+            .controls { gap: 6px; }
+            button { padding: 6px 12px; font-size: 0.7rem; }
+            .map-legend { bottom: 10px; left: 10px; padding: 8px 12px; }
+        }
+    </style>
+</head>
+<body>
+    <div id="header">
+        <div class="logo-area">
+            <img src="https://i4searchgroup.com/wp-content/uploads/2024/03/i4-LOGO-HEALTHCARE-RECRUITING-300x300-1-1-1-300x90.png"
+       style="height:50px; vertical-align:middle; margin-right:8px;">
+            <h1 class="title">Territory Map</h1>
+            <div class="badge-group">
+                <span class="dataset-badge" id="currentMapLabel">Allied</span>
+            </div>
+        </div>
+        <div class="controls">
+            <button id="goToNursing" class="nav-btn">🏥 Nursing Map</button>
+            <button id="goToAllied" class="nav-btn">🏭 Allied Map</button>
+            <button id="resetMap" class="reset-btn">🗺️ Reset View</button>
+            <button id="markOpenBtn" class="mark-open">⚪ Mark OPEN</button>
+            <button id="markSold" class="mark-sold">🔵 Mark SOLD</button>
+            <button id="saveChanges" class="save-btn">💾 Save Changes</button>
+            <button id="exportCSV" class="export-csv">📥 Export CSV</button>
+        </div>
+    </div>
+    <div id="main">
+        <div id="sidebar">
+            <div class="info-panel">
+                <h3>📊 Territory KPIs</h3>
+                <div id="statsContent">
+                    <div class="kpi-card"><div class="kpi-value" id="kpiOpen">0</div><div class="kpi-label" id="openLabelText">OPEN</div><div class="kpi-sub"></div></div>
+                    <div class="kpi-card"><div class="kpi-value" id="kpiSold">0</div><div class="kpi-label">SOLD</div><div class="kpi-sub"></div></div>
+                    <div class="kpi-card"><div class="kpi-value" id="kpiTotal">0</div><div class="kpi-label">TOTAL</div><div class="kpi-sub"></div></div>
+                    <div class="kpi-card"><div class="kpi-value" id="kpiDataset">Allied</div><div class="kpi-label">DATA SET</div><div class="kpi-sub"></div></div>
+                </div>
+            </div>
+            <div class="info-panel">
+                <h3>🔎 Filter & Controls</h3>
+                <div class="filter-group">
+                    <div class="filter-label">Status</div>
+                    <select id="statusFilter" style="width:100%;">
+                        <option value="ALL">All Statuses</option>
+                        <option value="OPEN" id="openFilterOption">⚪ OPEN Only</option>
+                        <option value="AVAILABLE" id="availableFilterOption" style="display:none;">⚪ AVAILABLE Only</option>
+                        <option value="SOLD">🔵 SOLD Only</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <div class="filter-label">Territory Search</div>
+                    <div class="territory-search-wrapper">
+                        <select id="territorySearch" multiple></select>
+                        <div class="territory-buttons">
+                            <button id="selectAllTerritories" class="reset-btn">✅ Select All</button>
+                            <button id="clearAllTerritories" class="reset-btn">❌ Clear All</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="map-container">
+            <div id="map"></div>
+            <div class="map-legend">
+                <div class="legend-item"><div class="legend-color open"></div><span>Open / Available</span></div>
+                <div class="legend-item"><div class="legend-color sold"></div><span>Sold</span></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    
+    <script>
+        // ========== 100% ORIGINAL LOGIC PRESERVED ==========
+        // All core logic unchanged. Functions, events, state management, data flow remain identical.
+        const GLOBAL_STORAGE_URL = "https://script.google.com/macros/s/AKfycbx1t2TlKywVWWPu8tb9iRb0BC9U4zmGKWOvgOKLFlrmHguZi5TsdFvYR1rrU7Wa4ISl7A/exec";
+        const ALLIED_URL = "https://dl.dropboxusercontent.com/scl/fi/4ktc2w1vzh0kqtkzrc7fh/Allied-1.geojson?rlkey=3rt8co0edw489qv8wv7sdwvpp&dl=1";
+        const NURSING_URL = "https://dl.dropboxusercontent.com/scl/fi/uy43mrr20ticits76u1lk/Nursing.geojson?rlkey=vhp35chibd2zb7ew5xo8q5q4o&dl=1";
+        const BOUNDARY_URL = "https://dl.dropboxusercontent.com/scl/fi/dzod4hy61zro0y3489mba/Boundary.geojson?rlkey=6clf6dlgivju1fhu7fddn8ohu&dl=1";
+        const CONTINENTAL_BOUNDS = [[24.5, -125], [49.5, -66]];
+        const COLOR_OPEN = "#7A7A7A";
+        const COLOR_SOLD = "#2F3E9E";
+        const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1a2yxh3D7UPWPQ6r0w5Rs7MCnzm7Dnh2luIv_BWuO1f4/export?format=csv&gid=0";
+        const SIMPLE_BOUNDARY = { "type": "FeatureCollection", "features": [{ "type": "Feature", "properties": {}, "geometry": { "type": "MultiPolygon", "coordinates": [[[ [-124.5, 48.5], [-124.5, 32.5], [-114.5, 32.5], [-114.5, 28.5], [-80.5, 28.5], [-80.5, 25.5], [-66.5, 25.5], [-66.5, 44.5], [-82.5, 44.5], [-82.5, 48.5], [-124.5, 48.5] ]]] } }] };
+        
+        let map, currentGeoLayer = null, territoryChoices, boundaryLayer = null;
+        let allTerritoriesList = [], territoryLabelsArray = [], territoryPolygonsMap = new Map();
+        let currentDataset = "ALLIED", loadingOverlay = null;
+        let territoryLinkMap = new Map();
+        
+        class GeoJSONCache { constructor() { this.dbName = 'HealthRecruitCache'; this.storeName = 'geojson'; this.db = null; this.initDB(); } async initDB() { return new Promise((resolve, reject) => { const request = indexedDB.open(this.dbName, 1); request.onerror = () => reject(request.error); request.onsuccess = () => { this.db = request.result; resolve(); }; request.onupgradeneeded = (event) => { const db = event.target.result; if (!db.objectStoreNames.contains(this.storeName)) { db.createObjectStore(this.storeName, { keyPath: 'id' }); } }; }); } async get(key) { if (!this.db) await this.initDB(); return new Promise((resolve, reject) => { const tx = this.db.transaction([this.storeName], 'readonly'); const req = tx.objectStore(this.storeName).get(key); req.onsuccess = () => resolve(req.result ? req.result.data : null); req.onerror = () => reject(req.error); }); } async set(key, data) { if (!this.db) await this.initDB(); return new Promise((resolve, reject) => { const tx = this.db.transaction([this.storeName], 'readwrite'); const req = tx.objectStore(this.storeName).put({ id: key, data, timestamp: Date.now() }); req.onsuccess = () => resolve(); req.onerror = () => reject(req.error); }); } }
+        const cacheDB = new GeoJSONCache();
+        async function fetchGeoJSONWithCache(url, datasetKey) { const cacheKey = `geojson_${datasetKey}`; try { const cached = await cacheDB.get(cacheKey); if (cached?.features?.length) return cached; } catch(e) {} showLoading(`Loading ${datasetKey}...`); const response = await fetch(url, { cache: "force-cache" }); const data = await response.json(); await cacheDB.set(cacheKey, data); hideLoading(); return data; }
+        async function loadGoogleSheetLinks() { try { showLoading("Loading..."); const response = await fetch(GOOGLE_SHEET_CSV_URL); if (!response.ok) throw new Error("Cannot fetch sheet"); const csvText = await response.text(); const rows = csvText.split(/\r?\n/).filter(row => row.trim().length > 0); if (rows.length < 2) throw new Error("Sheet missing data"); const headers = rows[0].split(',').map(h => h.replace(/["']/g, '').trim().toLowerCase()); const linkIdx = headers.findIndex(h => h === 'link'); const territoryIdx = headers.findIndex(h => h === 'territory'); if (linkIdx === -1 || territoryIdx === -1) { territoryLinkMap.clear(); for (let i = 1; i < rows.length; i++) { const cols = rows[i].split(',').map(c => c.replace(/["']/g, '').trim()); if (cols.length >= 2) { let possibleLink = cols[0]; let possibleTerr = cols[1]; if (possibleLink.startsWith("http")) territoryLinkMap.set(normalizeTerritoryName(possibleTerr), possibleLink); } } } else { territoryLinkMap.clear(); for (let i = 1; i < rows.length; i++) { const cols = parseCSVRow(rows[i]); if (cols.length > Math.max(linkIdx, territoryIdx)) { const rawLink = cols[linkIdx]; const rawTerritory = cols[territoryIdx]; if (rawLink && rawTerritory && (rawLink.startsWith("http") || rawLink.startsWith("https"))) territoryLinkMap.set(normalizeTerritoryName(rawTerritory), rawLink); } } } console.log(`✅ Loaded ${territoryLinkMap.size} territory links`); hideLoading(); showToast(`📄 Loaded ${territoryLinkMap.size} document links`, false); refreshLabelClickHandlers(); } catch (err) { console.error(err); hideLoading(); showToast("⚠️ Could not fetch sheet links", true); } }
+        function parseCSVRow(rowStr) { const result = []; let inQuote = false; let current = ''; for (let i = 0; i < rowStr.length; i++) { const ch = rowStr[i]; if (ch === '"') inQuote = !inQuote; else if (ch === ',' && !inQuote) { result.push(current.trim()); current = ''; } else current += ch; } result.push(current.trim()); return result.map(v => v.replace(/^"|"$/g, '').trim()); }
+        function normalizeTerritoryName(name) { if (!name) return ''; return name.toString().trim().toUpperCase(); }
+        function showLoading(msg) { if (loadingOverlay) { loadingOverlay.style.display = "flex"; const msgDiv = document.getElementById("loadingMsgText"); if (msgDiv) msgDiv.innerText = msg; return; } loadingOverlay = document.createElement('div'); loadingOverlay.id = 'loadingOverlay'; loadingOverlay.innerHTML = `<div class="loading-card"><div class="spinner"></div><div id="loadingMsgText" style="color:#2F3E9E; font-weight:bold;">${msg}</div></div>`; document.body.appendChild(loadingOverlay); }
+        function hideLoading() { if (loadingOverlay) loadingOverlay.style.display = "none"; }
+        function showToast(msg, isError = false) { const toast = document.createElement('div'); toast.className = 'toast-notify'; toast.style.background = isError ? '#6B7280' : '#2F3E9E'; toast.innerText = msg; document.body.appendChild(toast); setTimeout(() => toast.remove(), 2800); }
+        function getOpenStatusName() { return currentDataset === "ALLIED" ? "OPEN" : "AVAILABLE"; }
+        function updateUIForDataset() { const markBtn = document.getElementById("markOpenBtn"); const openFilter = document.getElementById("openFilterOption"); const availableFilter = document.getElementById("availableFilterOption"); if (currentDataset === "ALLIED") { markBtn.innerHTML = "⬤ Mark OPEN"; openFilter.style.display = "block"; availableFilter.style.display = "none"; document.getElementById("openLabelText").innerText = "OPEN"; } else { markBtn.innerHTML = "⬤ Mark AVAILABLE"; openFilter.style.display = "none"; availableFilter.style.display = "block"; document.getElementById("openLabelText").innerText = "AVAILABLE"; } document.getElementById("currentMapLabel").innerText = currentDataset === "ALLIED" ? "Allied" : "Nursing"; document.getElementById("kpiDataset").innerText = currentDataset === "ALLIED" ? "Allied" : "Nursing"; }
+        function ensureBoundaryOnTop() { if (boundaryLayer) boundaryLayer.bringToFront(); }
+        async function loadFromSheet() { try { const response = await fetch(GLOBAL_STORAGE_URL); const sheetData = await response.json(); const loadedStatuses = new Map(); for (const [key, status] of Object.entries(sheetData)) { const parts = key.split("|"); if (parts.length === 2 && parts[0] === currentDataset) loadedStatuses.set(parts[1], status); } return loadedStatuses; } catch(err) { return null; } }
+        async function saveToSheet() { if (!currentGeoLayer) { showToast("Data not ready", true); return; } showLoading("Saving..."); const statusesToSave = {}; currentGeoLayer.eachLayer(layer => { const p = layer.feature.properties; const territoryName = p.Territory_ || p.Territory; let currentStatus = p.Status; let saveStatus = ""; if (currentStatus === "SOLD") saveStatus = "SOLD"; else if (currentStatus === "OPEN" || currentStatus === "AVAILABLE") saveStatus = "OPEN"; if (saveStatus) statusesToSave[currentDataset + "|" + territoryName] = saveStatus; }); try { await fetch(GLOBAL_STORAGE_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(statusesToSave) }); showToast(`✅ Saved!`); } catch(err) { showToast("Save failed!", true); } hideLoading(); }
+        function getVisibleLayersForMark() { const selected = territoryChoices?.getValue(true) || []; let statusVal = document.getElementById("statusFilter")?.value || "ALL"; if (currentDataset === "NURSING" && statusVal === "OPEN") statusVal = "AVAILABLE"; if (currentDataset === "ALLIED" && statusVal === "AVAILABLE") statusVal = "OPEN"; const visible = []; currentGeoLayer.eachLayer(layer => { const terrMatch = selected.length === 0 || selected.includes(layer.feature.properties.Territory_ || layer.feature.properties.Territory); const statusMatch = statusVal === "ALL" || layer.feature.properties.Status === statusVal; if (terrMatch && statusMatch) visible.push(layer); }); return visible; }
+        function markVisibleAs(statusNew) { const layers = getVisibleLayersForMark(); if (!layers.length) { showToast("No territories to mark!", true); return; } for (let layer of layers) { if (currentDataset === "NURSING" && statusNew === "OPEN") layer.feature.properties.Status = "AVAILABLE"; else if (currentDataset === "ALLIED" && statusNew === "AVAILABLE") layer.feature.properties.Status = "OPEN"; else layer.feature.properties.Status = statusNew; } refreshAllStyles(); showToast(`✅ ${layers.length} marked as ${statusNew}`); }
+        function refreshAllStyles() { if (!currentGeoLayer) return; const selected = territoryChoices?.getValue(true) || []; let statusVal = document.getElementById("statusFilter")?.value || "ALL"; if (currentDataset === "NURSING" && statusVal === "OPEN") statusVal = "AVAILABLE"; if (currentDataset === "ALLIED" && statusVal === "AVAILABLE") statusVal = "OPEN"; const selArray = Array.isArray(selected) ? selected : []; currentGeoLayer.eachLayer(layer => { const territoryId = layer.feature.properties.Territory_ || layer.feature.properties.Territory; const currentStatus = layer.feature.properties.Status; const territoryMatch = selArray.length === 0 || selArray.includes(territoryId); const statusMatch = statusVal === "ALL" || currentStatus === statusVal; const visible = territoryMatch && statusMatch; const baseColor = (currentStatus === "OPEN" || currentStatus === "AVAILABLE") ? COLOR_OPEN : COLOR_SOLD; layer.setStyle({ color: "#000000", weight: 1.2, fillOpacity: visible ? 0.9 : 0, opacity: visible ? 1 : 0, fillColor: baseColor }); }); updateStats(selArray, statusVal); updateLabelsVisibility(); ensureBoundaryOnTop(); }
+        function updateStats(selectedArr, statusFilterVal) { if (!currentGeoLayer) return; let openCount = 0, soldCount = 0; const visibleTerritoriesSet = new Set(); currentGeoLayer.eachLayer(layer => { const terrName = layer.feature.properties.Territory_ || layer.feature.properties.Territory; if (selectedArr.length !== 0 && !selectedArr.includes(terrName)) return; const stat = layer.feature.properties.Status; if (statusFilterVal === "ALL" || stat === statusFilterVal) { if (!visibleTerritoriesSet.has(terrName)) { visibleTerritoriesSet.add(terrName); if (stat === "OPEN" || stat === "AVAILABLE") openCount++; else if (stat === "SOLD") soldCount++; } } }); const totalVisible = visibleTerritoriesSet.size; document.getElementById("kpiOpen").innerText = openCount; document.getElementById("kpiSold").innerText = soldCount; document.getElementById("kpiTotal").innerText = totalVisible; }
+        function updateLabelsVisibility() { const selected = territoryChoices?.getValue(true) || []; let statusVal = document.getElementById("statusFilter")?.value || "ALL"; if (currentDataset === "NURSING" && statusVal === "OPEN") statusVal = "AVAILABLE"; if (currentDataset === "ALLIED" && statusVal === "AVAILABLE") statusVal = "OPEN"; const selectedArr = Array.isArray(selected) ? selected : []; const visibleTerritories = new Set(); currentGeoLayer?.eachLayer(layer => { const territoryName = layer.feature.properties.Territory_ || layer.feature.properties.Territory; const territoryMatch = selectedArr.length === 0 || selectedArr.includes(territoryName); const statusMatch = statusVal === "ALL" || layer.feature.properties.Status === statusVal; if (territoryMatch && statusMatch) visibleTerritories.add(territoryName); }); territoryLabelsArray.forEach(label => { const el = label.getElement(); if (el) { const visible = visibleTerritories.has(label.options.territoryName); el.style.opacity = visible ? '1' : '0'; el.style.visibility = visible ? 'visible' : 'hidden'; if (visible && !el._clickHandlerAttached) { el.style.cursor = 'pointer'; el.addEventListener('click', (e) => { e.stopPropagation(); openGoogleSheetForTerritory(label.options.territoryName); }); el._clickHandlerAttached = true; } } }); }
+        function openGoogleSheetForTerritory(territoryName) { const normalized = normalizeTerritoryName(territoryName); const link = territoryLinkMap.get(normalized); if (link && (link.startsWith("http") || link.startsWith("https"))) { window.open(link, "_blank"); showToast(`📄 Opening document for ${territoryName}`, false); } else { window.open("https://docs.google.com/spreadsheets/d/1a2yxh3D7UPWPQ6r0w5Rs7MCnzm7Dnh2luIv_BWuO1f4/edit?usp=sharing", "_blank"); showToast(`ℹ️ No specific link for ${territoryName}, opening main sheet`, false); } }
+        function refreshLabelClickHandlers() { territoryLabelsArray.forEach(label => { const el = label.getElement(); if (el && !el._clickHandlerAttached) { el.style.cursor = 'pointer'; el.addEventListener('click', (e) => { e.stopPropagation(); openGoogleSheetForTerritory(label.options.territoryName); }); el._clickHandlerAttached = true; } }); }
+        function applyFiltersFast() { if (window.filterDebounce) clearTimeout(window.filterDebounce); window.filterDebounce = setTimeout(() => refreshAllStyles(), 15); }
+        function zoomToSelectedTerritories() { const selected = territoryChoices?.getValue(true) || []; if (!selected.length) { map.fitBounds(CONTINENTAL_BOUNDS); return; } const bounds = L.latLngBounds(); currentGeoLayer?.eachLayer(layer => { const territoryName = layer.feature.properties.Territory_ || layer.feature.properties.Territory; if (selected.includes(territoryName)) bounds.extend(layer.getBounds()); }); if (bounds.isValid()) map.fitBounds(bounds, { padding: [50, 50] }); }
+        function selectAllTerritories() { if (!territoryChoices || !allTerritoriesList.length) return; territoryChoices.setValue([...allTerritoriesList]); applyFiltersFast(); setTimeout(() => zoomToSelectedTerritories(), 100); }
+        function clearAllAndResetView() { territoryChoices?.removeActiveItems(); document.getElementById("statusFilter").value = "ALL"; applyFiltersFast(); map.fitBounds(CONTINENTAL_BOUNDS); }
+        function exportCSVSelectedOnly() { if (!currentGeoLayer) return; const selected = territoryChoices?.getValue(true) || []; if (!selected.length) { showToast("No territory selected", true); return; } const rows = [["Territory", "County", "State", "Status"]]; currentGeoLayer.eachLayer(layer => { const p = layer.feature.properties; const territoryName = p.Territory_ || p.Territory; if (selected.includes(territoryName)) rows.push([territoryName, p.County, p.State, p.Status]); }); const csvContent = rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(",")).join("\n"); const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" }); const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `${currentDataset}_${Date.now()}.csv`; link.click(); URL.revokeObjectURL(link.href); showToast(`📥 Exported`); }
+        function calculateTerritoryCenter(territoryName) { const polygons = territoryPolygonsMap.get(territoryName); if (!polygons?.length) return null; if (polygons.length === 1) return polygons[0].getBounds().getCenter(); let totalLat = 0, totalLng = 0, validCount = 0; polygons.forEach(polygon => { try { const center = polygon.getBounds().getCenter(); totalLat += center.lat; totalLng += center.lng; validCount++; } catch(e) {} }); return validCount ? L.latLng(totalLat / validCount, totalLng / validCount) : null; }
+        function addTerritoryLabels() { territoryLabelsArray.forEach(label => map.removeLayer(label)); territoryLabelsArray = []; if (!currentGeoLayer) return; territoryPolygonsMap.clear(); currentGeoLayer.eachLayer(layer => { const territoryName = layer.feature.properties.Territory_ || layer.feature.properties.Territory; if (!territoryPolygonsMap.has(territoryName)) territoryPolygonsMap.set(territoryName, []); territoryPolygonsMap.get(territoryName).push(layer); }); for (let [territoryName, polygons] of territoryPolygonsMap) { const center = calculateTerritoryCenter(territoryName); if (center) { const labelIcon = L.divIcon({ className: 'custom-territory-label', html: `<div class="territory-label" data-terr="${territoryName}">${territoryName}</div>`, iconSize: [null, null], iconAnchor: [50, 12] }); const labelMarker = L.marker(center, { icon: labelIcon, interactive: true, zIndexOffset: 2000 }); labelMarker.options.territoryName = territoryName; labelMarker.addTo(map); territoryLabelsArray.push(labelMarker); } } refreshLabelClickHandlers(); updateLabelsVisibility(); }
+        async function loadBoundaryLayer() { if (boundaryLayer) map.removeLayer(boundaryLayer); boundaryLayer = L.geoJSON(SIMPLE_BOUNDARY, { style: { color: "#FF8C00", weight: 3, fillOpacity: 0, opacity: 1 }, interactive: false }).addTo(map); boundaryLayer.bringToFront(); fetchGeoJSONWithCache(BOUNDARY_URL, "BOUNDARY_LAYER").then(geoData => { if (geoData && boundaryLayer) { map.removeLayer(boundaryLayer); boundaryLayer = L.geoJSON(geoData, { style: { color: "#FF8C00", weight: 3, fillOpacity: 0, opacity: 1 }, interactive: false }).addTo(map); boundaryLayer.bringToFront(); } }).catch(() => console.log("Using simple boundary")); }
+        async function loadGeoJSON(url, isNursing = false) { const datasetKey = isNursing ? "NURSING" : "ALLIED"; showLoading(`Loading ${datasetKey}...`); try { let geoData = await fetchGeoJSONWithCache(url, datasetKey); const savedStatuses = await loadFromSheet(); for (let feat of geoData.features) { if (!feat.properties) feat.properties = {}; const territoryName = feat.properties.Territory_ || feat.properties.Territory; let defaultStatus = isNursing ? "AVAILABLE" : "OPEN"; if (savedStatuses?.has(territoryName) && savedStatuses.get(territoryName) === "SOLD") defaultStatus = "SOLD"; feat.properties.Status = defaultStatus; } if (currentGeoLayer) map.removeLayer(currentGeoLayer); currentGeoLayer = L.geoJSON(geoData, { style: (feature) => { const status = feature.properties.Status; const baseColor = (status === "OPEN" || status === "AVAILABLE") ? COLOR_OPEN : COLOR_SOLD; return { color: baseColor, weight: 0.8, fillOpacity: 0.7, opacity: 0.9, fillColor: baseColor }; }, onEachFeature: (feature, layer) => { layer.on({ mouseover: (e) => { if (e.target.options.fillOpacity > 0) e.target.setStyle({ weight: 2, color: "#ffc107" }); }, mouseout: () => refreshAllStyles(), click: (e) => { if (e.target.options.fillOpacity > 0) { const status = feature.properties.Status; const statusColor = (status === "OPEN" || status === "AVAILABLE") ? COLOR_OPEN : COLOR_SOLD; layer.bindPopup(`<b>🏘️ ${feature.properties.Territory_ || feature.properties.Territory}</b><br>📍 ${feature.properties.County}<br>🗺️ ${feature.properties.State}<br><span style="color:${statusColor}; font-weight:bold;">📌 ${status}</span>`).openPopup(); } } }); } }).addTo(map); const territoryMap = new Map(); currentGeoLayer.eachLayer(l => { const raw = l.feature.properties.Territory_ || l.feature.properties.Territory; const clean = raw.trim().toUpperCase(); if (!territoryMap.has(clean)) territoryMap.set(clean, raw); }); allTerritoriesList = Array.from(territoryMap.values()).sort(); if (territoryChoices) { territoryChoices.clearStore(); territoryChoices.setChoices(allTerritoriesList.map(t => ({ value: t, label: t }))); territoryChoices.removeActiveItems(); } addTerritoryLabels(); refreshAllStyles(); map.fitBounds(CONTINENTAL_BOUNDS); hideLoading(); showToast(`✅ ${datasetKey} ready`); ensureBoundaryOnTop(); } catch(err) { hideLoading(); showToast(`Error loading ${datasetKey}!`, true); } }
+        async function switchToAllied() { if (currentDataset === "ALLIED") return; currentDataset = "ALLIED"; updateUIForDataset(); await loadGeoJSON(ALLIED_URL, false); ensureBoundaryOnTop(); }
+        async function switchToNursing() { if (currentDataset === "NURSING") return; currentDataset = "NURSING"; updateUIForDataset(); await loadGeoJSON(NURSING_URL, true); ensureBoundaryOnTop(); }
+        async function initMapAndControls() { map = L.map('map', { zoomSnap: 0.5, zoomDelta: 0.5, zoomControl: true, maxZoom: 24, minZoom: 3 }).setView([39.5, -98.5], 5); L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; OSM & CartoDB', subdomains: 'abcd', maxZoom: 24 }).addTo(map); territoryChoices = new Choices('#territorySearch', { removeItemButton: true, placeholderValue: '🔍 Search territory...', searchEnabled: true, searchChoices: true, shouldSort: false, itemSelectText: '' }); document.getElementById("territorySearch").addEventListener('change', () => { applyFiltersFast(); setTimeout(() => zoomToSelectedTerritories(), 150); }); document.getElementById("statusFilter").addEventListener("change", () => applyFiltersFast()); document.getElementById("resetMap").addEventListener("click", () => { map.fitBounds(CONTINENTAL_BOUNDS); ensureBoundaryOnTop(); }); document.getElementById("markOpenBtn").addEventListener("click", () => markVisibleAs(getOpenStatusName())); document.getElementById("markSold").addEventListener("click", () => markVisibleAs("SOLD")); document.getElementById("saveChanges").addEventListener("click", saveToSheet); document.getElementById("exportCSV").addEventListener("click", exportCSVSelectedOnly); document.getElementById("selectAllTerritories").addEventListener("click", selectAllTerritories); document.getElementById("clearAllTerritories").addEventListener("click", clearAllAndResetView); document.getElementById("goToNursing").addEventListener("click", switchToNursing); document.getElementById("goToAllied").addEventListener("click", switchToAllied); updateUIForDataset(); await loadBoundaryLayer(); await loadGeoJSON(ALLIED_URL, false); await loadGoogleSheetLinks(); ensureBoundaryOnTop(); }
+        window.addEventListener('DOMContentLoaded', initMapAndControls);
+    </script>
+</body>
+</html>
