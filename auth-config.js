@@ -1,6 +1,6 @@
 // ========== SIMPLE GOOGLE SHEET LOGIN - NO FORGOT PASSWORD ==========
 
-const USERS_SHEET_URL = "https://docs.google.com/spreadsheets/d/1-MT2nyCwg4OeKV4vjfRZb5cRWVx1ZYcnXkxRbYIi5cQ/export?format=csv&gid=0";
+const USERS_SHEET_URL = "https://api.allorigins.win/raw?url=https://docs.google.com/spreadsheets/d/1-MT2nyCwg4OeKV4vjfRZb5cRWVx1ZYcnXkxRbYIi5cQ/export?format=csv&gid=0";
 
 // Verify login from Google Sheet (Column A = Username, Column B = Password)
 window.verifyLoginWithSheet = async function(username, password) {
